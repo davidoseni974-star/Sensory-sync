@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SensorySync | Precision Gaming Sensitivity Calibration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <style>
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-purple: #bc13fe;
+            --dark-bg: #0a0a0f;
+            --card-bg: #12121a;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark-bg);
+            color: #e0e0e0;
+            overflow-x: hidden;
+        }
+        
+        .font-cyber {
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .neon-text {
+            text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan), 0 0 40px var(--neon-cyan);
+        }
+        
+        .neon-border {
+            box-shadow: 0 0 10px var(--neon-cyan), inset 0 0 10px rgba(0, 243, 255, 0.1);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .glass-panel {
+            background: rgba(18, 18, 26, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+        }
+        
+        .grid-bg {
+            background-image: 
+                linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+        
+        .calculator-range {
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent;
+            cursor: pointer;
+        }
+        
+        .calculator-range::-webkit-slider-track {
+            background: #1a1a2e;
+            height: 8px;
+            border-radius: 4px;
+        }
+        
+        .calculator-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            background: var(--neon-cyan);
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            margin-top: -8px;
+            box-shadow: 0 0 10px var(--neon-cyan);
+            transition: transform 0.2s;
+        }
+        
+        .calculator-range::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+        
+        .pulse-glow {
+            animation: pulse-glow 2s infinite;
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 243, 255, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(0, 243, 255, 0.8); }
+        }
+        
+        .float {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .result-card {
+            background: linear-gradient(135deg, rgba(0, 243, 255, 0.1), rgba(188, 19, 254, 0.1));
+            border: 1px solid rgba(0, 243, 255, 0.3);
+        }
+        
+        .hidden-section {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        .booking-form input:focus, .booking-form select:focus, .booking-form textarea:focus {
+            outline: none;
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+        }
+        
+        .service-card {
+            transition: all 0.3s ease;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(0, 243, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="grid-bg min-h-screen">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass-panel border-b border-cyan-500/20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex items-center space-x-2">
+                    <div class="w-10 h-10 bg-gradient-to-br from-cyan-400 to-purple-600 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-cyber font-bold text-xl">S</span>
+                    </div>
+                    <span class="font-cyber text-2xl font-bold text-white tracking-wider">Sensory<span class="text-cyan-400">Sync</span></span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#calculator" class="text-gray-300 hover:text-cyan-400 transition-colors">Calculator</a>
+                    <a href="#how-it-works" class="text-gray-300 hover:text-cyan-400 transition-colors">How It Works</a>
+                    <a href="#consultation" class="text-gray-300 hover:text-cyan-400 transition-colors">Book Consultation</a>
+                </div>
+                <button onclick="scrollToBooking()" class="bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-2 px-6 rounded-full transition-all transform hover:scale-105 pulse-glow">
+                    Get Calibrated →
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-b from-purple-900/20 to-transparent"></div>
+        <div class="max-w-7xl mx-auto relative z-10">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-8">
+                    <div class="inline-block px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-sm font-semibold tracking-wide">
+                        🎮 Trusted by 500+ Nigerian Gamers
+                    </div>
+                    <h1 class="font-cyber text-5xl md:text-7xl font-black leading-tight">
+                        Fix Your <span class="gradient-text">Aim</span><br>
+                        Dominate Every<br>
+                        <span class="text-white neon-text">Match</span>
+                    </h1>
+                    <p class="text-xl text-gray-400 max-w-lg leading-relaxed">
+                        Professional mouse DPI and sensitivity calibration for your specific game, device, and playstyle. Stop guessing, start winning.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button onclick="scrollToCalculator()" class="bg-gradient-to-r from-cyan-500 to-cyan-400 text-black font-bold py-4 px-8 rounded-full text-lg transition-all transform hover:scale-105 hover:shadow-[0_0_30px_rgba(0,243,255,0.5)]">
+                            Try Free Calculator
+                        </button>
+                        <button onclick="scrollToBooking()" class="border-2 border-purple-500 text-purple-400 hover:bg-purple-500 hover:text-white font-bold py-4 px-8 rounded-full text-lg transition-all">
+                            Book Expert Consultation →
+                        </button>
+                    </div>
+                    <div class="flex items-center space-x-6 text-sm text-gray-500">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                            <span>Available Today</span>
+                        </div>
+                        <div>⚡ 24hr Turnaround</div>
+                        <div>🇳🇬 Nigeria-Based</div>
+                    </div>
+                </div>
+                <div class="relative float">
+                    <div class="absolute inset-0 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-3xl blur-3xl opacity-20"></div>
+                    <div class="relative glass-panel rounded-3xl p-8 border border-cyan-500/30">
+                        <div class="space-y-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-cyan-400 font-cyber">SENSITIVITY_MATRIX.exe</span>
+                                <span class="text-xs text-gray-500">v2.4.1</span>
+                            </div>
+                            <div class="space-y-4">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-400">Current DPI</span>
+                                    <span class="text-cyan-400 font-mono">800</span>
+                                </div>
+                                <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-cyan-400 to-purple-500 w-1/3"></div>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-400">eDPI (CS:GO)</span>
+                                    <span class="text-purple-400 font-mono">640</span>
+                                </div>
+                                <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-purple-400 to-pink-500 w-2/3"></div>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-400">cm/360°</span>
+                                    <span class="text-green-400 font-mono">43.6cm</span>
+                                </div>
+                                <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-green-400 to-cyan-500 w-1/2"></div>
+                                </div>
+                            </div>
+                            <div class="mt-6 p-4 bg-cyan-500/10 rounded-lg border border-cyan-500/20">
+                                <p class="text-cyan-300 text-sm font-mono">> Optimal settings detected for FPS competitive play</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-12 border-y border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div class="space-y-2">
+                    <div class="text-3xl font-cyber font-bold text-cyan-400">500+</div>
+                    <div class="text-gray-500 text-sm">Gamers Calibrated</div>
+                </div>
+                <div class="space-y-2">
+                    <div class="text-3xl font-cyber font-bold text-purple-400">98%</div>
+                    <div class="text-gray-500 text-sm">Accuracy Improvement</div>
+                </div>
+                <div class="space-y-2">
+                    <div class="text-3xl font-cyber font-bold text-pink-400">15+</div>
+                    <div class="text-gray-500 text-sm">Games Supported</div>
+                </div>
+                <div class="space-y-2">
+                    <div class="text-3xl font-cyber font-bold text-green-400">24h</div>
+                    <div class="text-gray-500 text-sm">Delivery Time</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Calculator Section -->
+    <section id="calculator" class="py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="font-cyber text-4xl font-bold mb-4">Free <span class="gradient-text">Sensitivity Calculator</span></h2>
+                <p class="text-gray-400">Get your baseline settings in 30 seconds. For precision tuning, book a consultation.</p>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-8 md:p-12 border border-cyan-500/20">
+                <div class="grid md:grid-cols-2 gap-8 mb-8">
+                    <div class="space-y-4">
+                        <label class="block text-sm font-semibold text-gray-300">Gaming Genre</label>
+                        <select id="gameGenre" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-cyan-500 transition-colors">
+                            <option value="fps">FPS (Valorant, CS:GO, CoD)</option>
+                            <option value="battleroyale">Battle Royale (PUBG, Fortnite, Apex)</option>
+                            <option value="moba">MOBA (Dota 2, LoL)</option>
+                            <option value="strategy">Strategy (Starcraft, AoE)</option>
+                        </select>
+                    </div>
+                    <div class="space-y-4">
+                        <label class="block text-sm font-semibold text-gray-300">Mouse DPI Range</label>
+                        <select id="dpiRange" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-cyan-500 transition-colors">
+                            <option value="low">Low (400-800)</option>
+                            <option value="medium" selected>Medium (800-1600)</option>
+                            <option value="high">High (1600-3200)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="space-y-6 mb-8">
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <label class="text-sm font-semibold text-gray-300">Screen Resolution</label>
+                            <span id="resValue" class="text-cyan-400 font-mono">1920x1080</span>
+                        </div>
+                        <input type="range" id="screenRes" min="1" max="4" value="2" class="calculator-range w-full">
+                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>1080p</span>
+                            <span>1440p</span>
+                            <span>4K</span>
+                            <span>Ultrawide</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <label class="text-sm font-semibold text-gray-300">Mouse Grip Style</label>
+                            <span id="gripValue" class="text-purple-400 font-mono">Palm Grip</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4">
+                            <button onclick="selectGrip('palm')" class="grip-btn bg-gray-800 hover:bg-cyan-500/20 border border-gray-700 hover:border-cyan-500 rounded-lg py-3 text-sm transition-all text-center" data-grip="palm">Palm</button>
+                            <button onclick="selectGrip('claw')" class="grip-btn bg-gray-800 hover:bg-cyan-500/20 border border-gray-700 hover:border-cyan-500 rounded-lg py-3 text-sm transition-all text-center" data-grip="claw">Claw</button>
+                            <button onclick="selectGrip('fingertip')" class="grip-btn bg-gray-800 hover:bg-cyan-500/20 border border-gray-700 hover:border-cyan-500 rounded-lg py-3 text-sm transition-all text-center" data-grip="fingertip">Fingertip</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="calculateSensitivity()" class="w-full bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white font-bold py-4 rounded-lg text-lg transition-all transform hover:scale-[1.02]">
+                    Calculate Optimal Settings →
+                </button>
+
+                <!-- Results Section -->
+                <div id="calcResults" class="hidden mt-8 result-card rounded-xl p-6 space-y-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-cyber text-xl font-bold text-white">Your Recommended Settings</h3>
+                        <span class="text-xs bg-cyan-500/20 text-cyan-400 px-3 py-1 rounded-full">BETA</span>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="bg-gray-900/50 rounded-lg p-4 text-center">
+                            <div class="text-2xl font-bold text-cyan-400" id="recDPI">800</div>
+                            <div class="text-xs text-gray-500 mt-1">DPI</div>
+                        </div>
+                        <div class="bg-gray-900/50 rounded-lg p-4 text-center">
+                            <div class="text-2xl font-bold text-purple-400" id="recSens">0.4</div>
+                            <div class="text-xs text-gray-500 mt-1">In-Game Sens</div>
+                        </div>
+                        <div class="bg-gray-900/50 rounded-lg p-4 text-center">
+                            <div class="text-2xl font-bold text-pink-400" id="recEdpi">640</div>
+                            <div class="text-xs text-gray-500 mt-1">eDPI</div>
+                        </div>
+                        <div class="bg-gray-900/50 rounded-lg p-4 text-center">
+                            <div class="text-2xl font-bold text-green-400" id="recCm">45cm</div>
+                            <div class="text-xs text-gray-500 mt-1">cm/360°</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                        <p class="text-yellow-200 text-sm">
+                            ⚠️ <strong>These are baseline estimates.</strong> For professional-grade calibration including acceleration curves, LOD tuning, and game-specific configs, 
+                            <button onclick="scrollToBooking()" class="underline hover:text-cyan-400">book a consultation</button>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="py-20 px-4 sm:px-6 lg:px-8 bg-gray-900/30">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="font-cyber text-4xl font-bold mb-4">How <span class="gradient-text">Consultation</span> Works</h2>
+                <p class="text-gray-400">Professional calibration delivered in 3 simple steps</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="glass-panel rounded-2xl p-8 border border-cyan-500/20 relative overflow-hidden group hover:border-cyan-500/50 transition-all">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl group-hover:bg-cyan-500/20 transition-all"></div>
+                    <div class="w-16 h-16 bg-cyan-500/20 rounded-2xl flex items-center justify-center mb-6 text-2xl">1</div>
+                    <h3 class="font-cyber text-xl font-bold mb-3 text-white">Book & Pay</h3>
+                    <p class="text-gray-400 mb-4">Select your package below. You'll receive an invoice via email with local bank transfer details (GTBank, Access, etc).</p>
+                    <ul class="text-sm text-gray-500 space-y-2">
+                        <li class="flex items-center space-x-2"><span class="text-cyan-400">✓</span><span>Instant confirmation</span></li>
+                        <li class="flex items-center space-x-2"><span class="text-cyan-400">✓</span><span>Secure Nigerian banks</span></li>
+                    </ul>
+                </div>
+
+                <div class="glass-panel rounded-2xl p-8 border border-purple-500/20 relative overflow-hidden group hover:border-purple-500/50 transition-all">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl group-hover:bg-purple-500/20 transition-all"></div>
+                    <div class="w-16 h-16 bg-purple-500/20 rounded-2xl flex items-center justify-center mb-6 text-2xl">2</div>
+                    <h3 class="font-cyber text-xl font-bold mb-3 text-white">Diagnostic Session</h3>
+                    <p class="text-gray-400 mb-4">30-min video call where I analyze your current setup, grip, desk space, and gameplay footage.</p>
+                    <ul class="text-sm text-gray-500 space-y-2">
+                        <li class="flex items-center space-x-2"><span class="text-purple-400">✓</span><span>Hardware analysis</span></li>
+                        <li class="flex items-center space-x-2"><span class="text-purple-400">✓</span><span>Gameplay review</span></li>
+                    </ul>
+                </div>
+
+                <div class="glass-panel rounded-2xl p-8 border border-pink-500/20 relative overflow-hidden group hover:border-pink-500/50 transition-all">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-pink-500/10 rounded-full blur-3xl group-hover:bg-pink-500/20 transition-all"></div>
+                    <div class="w-16 h-16 bg-pink-500/20 rounded-2xl flex items-center justify-center mb-6 text-2xl">3</div>
+                    <h3 class="font-cyber text-xl font-bold mb-3 text-white">Receive Config</h3>
+                    <p class="text-gray-400 mb-4">Get your personalized sensitivity profile, mouse settings file, and 7-day adjustment guide within 24 hours.</p>
+                    <ul class="text-sm text-gray-500 space-y-2">
+                        <li class="flex items-center space-x-2"><span class="text-pink-400">✓</span><span>.cfg files included</span></li>
+                        <li class="flex items-center space-x-2"><span class="text-pink-400">✓</span><span>Follow-up support</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing/Booking Section -->
+    <section id="consultation" class="py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="font-cyber text-4xl font-bold mb-4">Choose Your <span class="gradient-text">Package</span></h2>
+                <p class="text-gray-400">One-time payment. No subscriptions. Local bank transfer accepted.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <!-- Starter -->
+                <div class="glass-panel rounded-2xl p-8 border border-gray-700 hover:border-cyan-500/50 transition-all service-card">
+                    <div class="text-center mb-6">
+                        <h3 class="font-cyber text-xl font-bold text-gray-300 mb-2">Quick Fix</h3>
+                        <div class="text-4xl font-bold text-white mb-2">₦5,000</div>
+                        <p class="text-gray-500 text-sm">One-game calibration</p>
+                    </div>
+                    <ul class="space-y-3 mb-8 text-sm text-gray-400">
+                        <li class="flex items-center space-x-2"><span class="text-cyan-400">✓</span><span>Single game optimization</span></li>
+                        <li class="flex items-center space-x-2"><span class="text-cyan-400">✓</span><span>DPI recommendation</span></li>
+                        <li class="flex items-center space-x-2"><span class="text-cyan-400">✓</span><span>Basic sensitivity settings</span></li>
+                        <li class="flex items-center space-x-2"><span class="text-cyan-400">✓</span><span>Email delivery (24h)</span></li>
+                    </ul>
+                    <button onclick="selectPackage('starter')" class="w-full border border-cyan-500 text-cyan-400 hover:bg-cyan-500 hover:text-black font-bold py-3 rounded-lg transition-all">
+                        Select Package
+                    </button>
+                </div>
+
+                <!-- Pro (Popular) -->
+                <div class="glass-panel rounded-2xl p-8 border-2 border-purple-500 relative transform scale-105 service-card">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold px-4 py-1 rounded-full">
+                        MOST POPULAR
+                    </div>
+                    <div class="text-center mb-6">
+                        <h3 class="font-cyber text-xl font-bold text-white mb-2">Pro Calibration</h3>
+                        <div class="text-4xl font-bold text-white mb-2">₦15,000</div>
+                        <p class="text-gray-500 text-sm">Full diagnostic + 3 games</p>
+                    </div>
+                    <ul class="space-y-3 mb-8 text-sm text-gray-300">
+                        <li class="flex items-center space-x-2"><span class="text-purple-400">✓</span><span>30-min video consultation</span></li>
+                        <li class="flex items-center space-x-2"><span class="text-purple-400">✓</span><span>Up to 3 game profiles</span></li>
+                        <li class="flex items-center space-x-2"><span class="text-purple-400">✓</span><span>Mouse acceleration tuning</span></li>
+                        <li class="flex items-center space-x-2"><span class="text-purple-400">✓</span><span>Cross-game sensitivity matching</span></li>
+                        <li class="flex items-center space-x-2"><span class="text-purple-400">✓</span><span>Config files (.cfg/.json)</span></li>
+                    </ul>
+                    <button onclick="selectPackage('pro')" class="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 text-white font-bold py-3 rounded-lg transition-all transform hover:scale-105">
+                        Select Package
+                    </button>
+                </div>
+
+                <!-- Elite -->
+                <div class="glass-panel rounded-2xl p-8 border border-gray-700 hover:border-cyan-500/50 transition-all service-card">
+                    <div class="text-center mb-6">
+                        <h3 class="font-cyber text-xl font-bold text-gray-300 mb-2">Elite Setup</h3>
+                        <div class="text-4xl font-bold text-white mb-2">₦35,000</div>
+                        <p class="text-gray-500 text-sm">Complete hardware optimization</p>
+                    </div>
+                    <ul class="space-y-3 mb-8 text-sm text-gray-400">
+                        <li class="flex items-center space-x-2"><span class="text-cyan-400">✓</span><span>Everything in Pro</span></li>
+                        <li class="flex items-center space-x-2"><span class="text-cyan-400">✓</span><span>Mouse pad recommendation</span></li>
+                        <li class="flex items-center space-x-2"><span class="text-cyan-400">✓</span><span>Grip technique coaching</span></li>
+                        <li class="flex items-center space-x-2"><span class="text-cyan-400">✓</span><span>30-day WhatsApp support</span></li>
+                        <li class="flex items-center space-x-2"><span class="text-cyan-400">✓</span><span>Upgrade path planning</span></li>
+                    </ul>
+                    <button onclick="selectPackage('elite')" class="w-full border border-cyan-500 text-cyan-400 hover:bg-cyan-500 hover:text-black font-bold py-3 rounded-lg transition-all">
+                        Select Package
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking Form Modal -->
+    <div id="bookingModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeModal()"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div class="glass-panel rounded-2xl p-8 max-w-md w-full border border-cyan-500/30 relative max-h-[90vh] overflow-y-auto">
+                <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl">&times;</button>
+                
+                <div class="text-center mb-6">
+                    <h3 class="font-cyber text-2xl font-bold text-white mb-2">Book Your Session</h3>
+                    <p class="text-gray-400 text-sm">Complete the form below. I'll send payment details via email.</p>
+                </div>
+
+                <form id="bookingForm" class="booking-form space-y-4" onsubmit="submitBooking(event)">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Full Name</label>
+                        <input type="text" id="clientName" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white transition-all">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Email Address</label>
+                        <input type="email" id="clientEmail" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white transition-all">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">WhatsApp Number</label>
+                        <input type="tel" id="clientPhone" placeholder="+234..." required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white transition-all">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Selected Package</label>
+                        <select id="selectedPackage" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white">
+                            <option value="starter">Quick Fix - ₦5,000</option>
+                            <option value="pro" selected>Pro Calibration - ₦15,000</option>
+                            <option value="elite">Elite Setup - ₦35,000</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Primary Game</label>
+                        <input type="text" id="primaryGame" placeholder="e.g., Valorant, Call of Duty Mobile" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white transition-all">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Current Mouse Model</label>
+                        <input type="text" id="mouseModel" placeholder="e.g., Logitech G502, Razer DeathAdder" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white transition-all">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Preferred Session Time</label>
+                        <select id="sessionTime" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white">
+                            <option value="morning">Morning (9AM - 12PM WAT)</option>
+                            <option value="afternoon">Afternoon (12PM - 5PM WAT)</option>
+                            <option value="evening">Evening (5PM - 9PM WAT)</option>
+                            <option value="weekend">Weekend Only</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Additional Notes</label>
+                        <textarea id="additionalNotes" rows="3" placeholder="Describe your current sensitivity issues..." class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white transition-all"></textarea>
+                    </div>
+
+                    <div class="pt-4">
+                        <button type="submit" class="w-full bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white font-bold py-4 rounded-lg transition-all transform hover:scale-[1.02] flex items-center justify-center space-x-2">
+                            <span>Request Booking</span>
+                            <span id="submitArrow">→</span>
+                        </button>
+                    </div>
+
+                    <p class="text-xs text-gray-500 text-center mt-4">
+                        You'll receive an invoice with local bank details within 2 hours. Payment confirms your slot.
+                    </p>
+                </form>
+
+                <!-- Success Message -->
+                <div id="successMessage" class="hidden text-center py-8">
+                    <div class="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-4xl">✓</span>
+                    </div>
+                    <h4 class="font-cyber text-xl font-bold text-white mb-2">Request Received!</h4>
+                    <p class="text-gray-400 mb-4">Check your email for payment instructions. Your session will be scheduled once payment is confirmed.</p>
+                    <button onclick="closeModal()" class="text-cyan-400 hover:text-cyan-300 underline">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8 bg-gray-900/30">
+        <div class="max-w-3xl mx-auto">
+            <h2 class="font-cyber text-3xl font-bold text-center mb-12">Frequently Asked <span class="gradient-text">Questions</span></h2>
+            
+            <div class="space-y-4">
+                <div class="glass-panel rounded-lg p-6 border border-gray-800">
+                    <h3 class="font-bold text-white mb-2">How is this different from online calculators?</h3>
+                    <p class="text-gray-400 text-sm">Online calculators use generic formulas. I analyze your specific hand size, grip pressure, desk space, and gameplay style to find your true optimal settings—often very different from calculator estimates.</p>
+                </div>
+                
+                <div class="glass-panel rounded-lg p-6 border border-gray-800">
+                    <h3 class="font-bold text-white mb-2">What payment methods do you accept?</h3>
+                    <p class="text-gray-400 text-sm">Bank transfer to GTBank, Access Bank, First Bank, or Opay. International clients can use PayPal. Crypto accepted (USDT).</p>
+                </div>
+                
+                <div class="glass-panel rounded-lg p-6 border border-gray-800">
+                    <h3 class="font-bold text-white mb-2">Can you help with controller sensitivity too?</h3>
+                    <p class="text-gray-400 text-sm">Yes! While mouse is my specialty, I also calibrate controller settings for FPS games like Call of Duty and Fortnite.</p>
+                </div>
+                
+                <div class="glass-panel rounded-lg p-6 border border-gray-800">
+                    <h3 class="font-bold text-white mb-2">What if I don't like the new settings?</h3>
+                    <p class="text-gray-400 text-sm">I offer one free revision within 7 days. Sensitivity changes take 3-5 days to feel natural—stick with it!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center space-x-2 mb-4 md:mb-0">
+                <div class="w-8 h-8 bg-gradient-to-br from-cyan-400 to-purple-600 rounded-lg flex items-center justify-center">
+                    <span class="text-white font-cyber font-bold">S</span>
+                </div>
+                <span class="font-cyber text-xl font-bold text-white">SensorySync</span>
+            </div>
+            <div class="text-gray-500 text-sm">
+                © 2024 SensorySync Nigeria. Precision gaming calibration.
+            </div>
+            <div class="flex space-x-6 mt-4 md:mt-0">
+                <a href="#" class="text-gray-400 hover:text-cyan-400 transition-colors">Twitter/X</a>
+                <a href="#" class="text-gray-400 hover:text-cyan-400 transition-colors">Instagram</a>
+                <a href="#" class="text-gray-400 hover:text-cyan-400 transition-colors">WhatsApp</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // GSAP Animations
+        gsap.registerPlugin(ScrollTrigger);
+        
+        // Animate sections on scroll
+        gsap.utils.toArray('.glass-panel').forEach((panel, i) => {
+            gsap.from(panel, {
+                scrollTrigger: {
+                    trigger: panel,
+                    start: "top 85%",
+                },
+                y: 50,
+                opacity: 0,
+                duration: 0.8,
+                delay: i * 0.1,
+                ease: "power3.out"
+            });
+        });
+
+        // Calculator Logic
+        let selectedGripStyle = 'palm';
+        
+        function selectGrip(grip) {
+            selectedGripStyle = grip;
+            document.querySelectorAll('.grip-btn').forEach(btn => {
+                btn.classList.remove('bg-cyan-500/20', 'border-cyan-500');
+                btn.classList.add('bg-gray-800', 'border-gray-700');
+            });
+            event.target.classList.remove('bg-gray-800', 'border-gray-700');
+            event.target.classList.add('bg-cyan-500/20', 'border-cyan-500');
+            
+            const gripNames = { palm: 'Palm Grip', claw: 'Claw Grip', fingertip: 'Fingertip Grip' };
+            document.getElementById('gripValue').textContent = gripNames[grip];
+        }
+
+        // Initialize palm as selected
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelector('[data-grip="palm"]').classList.add('bg-cyan-500/20', 'border-cyan-500');
+            document.querySelector('[data-grip="palm"]').classList.remove('bg-gray-800', 'border-gray-700');
+        });
+
+        function calculateSensitivity() {
+            const genre = document.getElementById('gameGenre').value;
+            const dpiRange = document.getElementById('dpiRange').value;
+            const screenRes = document.getElementById('screenRes').value;
+            
+            // Base calculations based on research
+            let baseDPI = 800;
+            let baseSens = 0.5;
+            
+            // Genre adjustments
+            const genreMultipliers = {
+                fps: { dpi: 0.8, sens: 0.6 },      // Lower DPI for precision
+                battleroyale: { dpi: 1.0, sens: 0.8 },
+                moba: { dpi: 1.2, sens: 1.0 },
+                strategy: { dpi: 1.4, sens: 1.2 }
+            };
+            
+            // DPI range adjustments
+            const dpiRanges = {
+                low: 600,
+                medium: 800,
+                high: 1600
+            };
+            
+            baseDPI = dpiRanges[dpiRange];
+            baseSens = genreMultipliers[genre].sens;
+            
+            // Grip adjustment
+            const gripMultipliers = {
+                palm: 0.9,      // More control, slightly lower sens
+                claw: 1.0,      // Balanced
+                fingertip: 1.1  // Faster movements
+            };
+            
+            baseSens *= gripMultipliers[selectedGripStyle];
+            
+            // Calculate eDPI and cm/360
+            const edpi = Math.round(baseDPI * baseSens);
+            const cm360 = Math.round((360 / (edpi * 0.022)) * 2.54); // Rough calculation
+            
+            // Display results
+            document.getElementById('recDPI').textContent = baseDPI;
+            document.getElementById('recSens').textContent = baseSens.toFixed(2);
+            document.getElementById('recEdpi').textContent = edpi;
+            document.getElementById('recCm').textContent = cm360 + 'cm';
+            
+            // Show results with animation
+            const results = document.getElementById('calcResults');
+            results.classList.remove('hidden');
+            gsap.from(results, { height: 0, opacity: 0, duration: 0.5, ease: "power2.out" });
+            
+            // Scroll to results
+            results.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Modal Functions
+        function selectPackage(pkg) {
+            document.getElementById('selectedPackage').value = pkg;
+            openModal();
+        }
+
+        function openModal() {
+            document.getElementById('bookingModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            gsap.from('#bookingModal > div:last-child', { scale: 0.9, opacity: 0, duration: 0.3 });
+        }
+
+        function closeModal() {
+            document.getElementById('bookingModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            // Reset form
+            setTimeout(() => {
+                document.getElementById('bookingForm').classList.remove('hidden');
+                document.getElementById('successMessage').classList.add('hidden');
+                document.getElementById('bookingForm').reset();
+            }, 300);
+        }
+
+        function submitBooking(e) {
+            e.preventDefault();
+            
+            // Simulate form submission
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="animate-spin">↻</span> Processing...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                document.getElementById('bookingForm').classList.add('hidden');
+                document.getElementById('successMessage').classList.remove('hidden');
+                gsap.from('#successMessage', { opacity: 0, y: 20, duration: 0.5 });
+                
+                // In production, this would send data to your backend/email service
+                console.log('Booking submitted:', {
+                    name: document.getElementById('clientName').value,
+                    email: document.getElementById('clientEmail').value,
+                    package: document.getElementById('selectedPackage').value,
+                    game: document.getElementById('primaryGame').value
+                });
+            }, 1500);
+        }
+
+        // Smooth scroll functions
+        function scrollToCalculator() {
+            document.getElementById('calculator').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function scrollToBooking() {
+            document.getElementById('consultation').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Screen resolution slider
+        document.getElementById('screenRes').addEventListener('input', (e) => {
+            const values = ['1920x1080', '2560x1440', '3840x2160', '3440x1440'];
+            document.getElementById('resValue').textContent = values[e.target.value - 1];
+        });
+    </script>
+</body>
+</html>
